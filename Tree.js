@@ -1,3 +1,14 @@
+/*
+                      3
+                     / \
+                    1   8
+                   / \ / \
+                  0  2 5  9
+                      / \  \
+                     4  7  10
+                       /
+                      6
+*/
 /**
  * 树的节点
  * @param {*} data 
@@ -55,34 +66,89 @@ Tree.prototype = {
    * 前序打印节点
    * @param {*} node 
    */
-  preOrder: function (node) {
+  preOrder: function (node, arr = []) {
     if (node) {
-      node.show()
-      this.preOrder(node.left)
-      this.preOrder(node.right)
+      arr.push(node.data)
+      this.preOrder(node.left, arr)
+      this.preOrder(node.right, arr)
+    }
+  },
+  preOrderStack: function (root) {
+    const stack = []
+    const result = []
+    let current = root
+    while (current || stack.length > 0) {
+      while (current) {
+        result.push(current.data)
+        stack.push(current)
+        current = current.left
+      }
+      current = stack.pop().right
+    }
+    return result
+  },
+  /**
+   * 中序遍历
+   * @param {*} node 
+   */
+  middleOrder: function (node, arr = []) {
+    if (node) {
+      this.middleOrder(node.left, arr)
+      arr.push(node.data)
+      this.middleOrder(node.right, arr)
     }
   },
   /**
-   * 中序打印节点
-   * @param {*} node 
+   * 非递归实现中序遍历
+   * @param {object} root 
    */
-  middleOrder: function (node) {
-    if (node) {
-      this.middleOrder(node.left)
-      node.show()
-      this.middleOrder(node.right)
+  middleOrderStack: function (root) {
+    const result = []
+    const stack = []
+    let current = root
+    while (current || stack.length > 0) {
+      while (current) {
+        stack.push(current)
+        current = current.left
+      }
+      current = stack.pop();
+      result.push(current.data)
+      current = current.right
     }
+    return result
   },
   /**
    * 后序打印节点
    * @param {*} node 
    */
-  laterOrder: function (node) {
+  laterOrder: function (node, arr = []) {
     if (node) {
-      this.laterOrder(node.left)
-      this.laterOrder(node.right)
-      node.show()
+      this.laterOrder(node.left, arr)
+      this.laterOrder(node.right, arr)
+      arr.push(node.data)
     }
+  },
+  laterOrderStack: function (root) {
+    const stack = []
+    const result = []
+    let prev = null
+    let current = root
+    while (current ||  stack.length > 0) {
+      while (current) {
+        stack.push(current)
+        current = current.left
+      }
+      current = stack[stack.length - 1]
+      if(!current.right || current.right === prev) {
+        current = stack.pop()
+        result.push(current.data)
+        prev = current
+        current = null
+      } else {
+        current = current.right
+      }
+    }
+    return result
   },
   /**
    * 获取最大值
@@ -128,12 +194,12 @@ Tree.prototype = {
    */
   getNode: function (data, node) {
     if (node) {
-      if(data === node.data) {
+      if (data === node.data) {
         return node
       } else if (data < node.data) {
-        return this.getNode(data,node.left)
+        return this.getNode(data, node.left)
       } else if (data > node.data) {
-        return this.getNode(data,node.right)
+        return this.getNode(data, node.right)
       }
     } else {
       return null
@@ -143,16 +209,20 @@ Tree.prototype = {
 var t = new Tree();
 t.insert(3);
 t.insert(8);
+t.insert(9);
 t.insert(1);
 t.insert(2);
 t.insert(5);
+t.insert(4);
 t.insert(7);
+t.insert(10)
 t.insert(6);
 t.insert(0);
-console.log(t);
-t.middleOrder(t.root)
-t.preOrder(t.root)
-t.laterOrder(t.root)
-console.log(t.getMin(), t.getMax());
+console.table(t);
+/* console.log(t.getMin(), t.getMax());
 console.log(t.getDeep(t.root, 0));
-console.log(t.getNode(5, t.root));
+console.log(t.getNode(5, t.root)); */
+const arr = []
+//t.middleOrder(t.root, arr)
+console.log(t.preOrderStack(t.root))
+console.log(t.middleOrderStack(t.root))
